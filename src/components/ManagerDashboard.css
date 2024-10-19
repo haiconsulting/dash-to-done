@@ -1,49 +1,49 @@
 .manager-dashboard {
-    background-color: #2c2c2c;
-    color: white;
-    padding: 20px;
-    min-height: 100vh;
-  }
-  
-  .manager-dashboard h2 {
-    color: #61dafb;
-  }
-  
-  .manual-task-form {
-    background-color: #3c3c3c;
-    padding: 20px;
-    border-radius: 5px;
-    margin-top: 20px;
-  }
-  
-  .manual-task-form h3 {
-    color: #61dafb;
-  }
-  
-  .manual-task-form input,
-  .manual-task-form textarea,
-  .manual-task-form select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    background-color: #4c4c4c;
-    border: none;
-    color: white;
-  }
-  
-  .manual-task-form button {
-    background-color: #61dafb;
-    color: #2c2c2c;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
-  
-  button {
-    background-color: #61dafb;
-    color: #2c2c2c;
-    border: none;
-    padding: 10px 20px;
-    margin-top: 10px;
-    cursor: pointer;
-  }
+  background-color: #2c2c2c;
+  color: white;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.manager-dashboard h2 {
+  color: #61dafb;
+}
+
+.manual-task-form {
+  background-color: #3c3c3c;
+  padding: 20px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.manual-task-form h3 {
+  color: #61dafb;
+}
+
+.manual-task-form input,
+.manual-task-form textarea,
+.manual-task-form select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #4c4c4c;
+  border: none;
+  color: white;
+}
+
+.manual-task-form button {
+  background-color: #61dafb;
+  color: #2c2c2c;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+button {
+  background-color: #61dafb;
+  color: #2c2c2c;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+}

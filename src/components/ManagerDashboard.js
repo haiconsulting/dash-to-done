@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TaskInput from './TaskInput';
 import TaskBoard from './TaskBoard';
-import './ManagerDashboard.css';
+import './ManagerDashboard.css';  // Make sure this line is present
 
 function ManagerDashboard({ user, tasks, setTasks }) {
   const [isInputLocked, setIsInputLocked] = useState(false);
