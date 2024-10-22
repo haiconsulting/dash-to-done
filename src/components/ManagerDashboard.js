@@ -1,15 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TaskInput from './TaskInput';
 import TaskBoard from './TaskBoard';
-import './ManagerDashboard.css';  // Make sure this line is present
+import TeamMemberPanel from './TeamMemberPanel';
+import { saveAppState, loadAppState } from '../services/aiService';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import './ManagerDashboard.css';
 
 function ManagerDashboard({ user, tasks, setTasks }) {
-  const [isInputLocked, setIsInputLocked] = useState(false);
-  const [newTask, setNewTask] = useState({ title: '', description: '', status: 'To Do' });
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [userQueries, setUserQueries] = useState([]);
+  const [editorContent, setEditorContent] = useState('');
+  const navigate = useNavigate();
 
-  const handleTasksGenerated = (newTasks) => {
-    setTasks([...tasks, ...newTasks]);
-    setIsInputLocked(true);
+  useEffect(() => {
+    const fetchAppState = async () => {
+      try {
+        const savedState = await loadAppState();
+        if (savedState) {
+          setTeamMembers(savedState.teamMembers);
+          setTasks(savedState.tasks);
+          setUserQueries(savedState.userQueries);
+        }
+      } catch (error) {
+        console.error('Error loading app state:', error);
+      }
+    };
+    fetchAppState();
+  }, [setTasks]);
+
+  const handleTasksGenerated = async (newTasks, query) => {
+    const updatedTasks = [...tasks, ...newTasks];
+    const updatedQueries = [...userQueries, query];
+    setTasks(updatedTasks);
+    setUserQueries(updatedQueries);
+    
+    try {
+      await saveAppState({ teamMembers, tasks: updatedTasks, userQueries: updatedQueries });
+      console.log('State saved successfully after generating tasks');
+    } catch (error) {
+      console.error('Error saving state after generating tasks:', error);
+    }
   };
 
   const handleTaskEdit = (editedTask) => {
@@ -19,56 +51,64 @@ function ManagerDashboard({ user, tasks, setTasks }) {
     setTasks(updatedTasks);
   };
 
-  const handleLockTasks = () => {
-    setIsInputLocked(true);
+  const handleSaveState = async () => {
+    try {
+      await saveAppState({ teamMembers, tasks, userQueries });
+      alert('State saved successfully');
+    } catch (error) {
+      console.error('Error saving state:', error);
+      alert('Failed to save state');
+    }
   };
 
-  const handleManualTaskSubmit = (e) => {
-    e.preventDefault();
-    const taskToAdd = { ...newTask, id: Date.now() };
-    setTasks([...tasks, taskToAdd]);
-    setNewTask({ title: '', description: '', status: 'To Do' });
+  const handleLogout = () => {
+    // Clear user data from state
+    // This depends on how you're managing user state in your app
+    // For example, if you have a setUser function:
+    // setUser(null);
+    navigate('/');
+  };
+
+  const handleEditorChange = (content) => {
+    setEditorContent(content);
   };
 
   return (
     <div className="manager-dashboard">
-      <h2>Manager Dashboard</h2>
-      {!isInputLocked && (
-        <TaskInput onTasksGenerated={handleTasksGenerated} />
-      )}
-      <TaskBoard 
-        tasks={tasks} 
-        onTaskEdit={handleTaskEdit} 
-        isManager={true}
-      />
-      {!isInputLocked && (
-        <button onClick={handleLockTasks}>Lock Tasks</button>
-      )}
-      <div className="manual-task-form">
-        <h3>Add Task Manually</h3>
-        <form onSubmit={handleManualTaskSubmit}>
-          <input
-            type="text"
-            placeholder="Task Title"
-            value={newTask.title}
-            onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-            required
+      <div className="dashboard-header">
+        <button onClick={handleLogout} className="logout-button">Logout</button>
+        <h2>Manager Dashboard</h2>
+        <button onClick={handleSaveState} className="save-state-button">Save State</button>
+      </div>
+      <div className="dashboard-content">
+        <div className="main-content">
+          <ReactQuill
+            value={editorContent}
+            onChange={handleEditorChange}
+            modules={{
+              toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'color': [] }, { 'background': [] }],
+                ['link', 'image'],
+                ['clean']
+              ],
+            }}
           />
-          <textarea
-            placeholder="Task Description"
-            value={newTask.description}
-            onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+          <TaskInput 
+            onTasksGenerated={handleTasksGenerated} 
+            teamMembers={teamMembers}
+            editorContent={editorContent}
+            setEditorContent={setEditorContent}
           />
-          <select
-            value={newTask.status}
-            onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
-          >
-            <option value="To Do">To Do</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
-          </select>
-          <button type="submit">Add Task</button>
-        </form>
+          <TaskBoard 
+            tasks={tasks} 
+            onTaskEdit={handleTaskEdit} 
+            isManager={true}
+          />
+        </div>
+        <TeamMemberPanel teamMembers={teamMembers} setTeamMembers={setTeamMembers} />
       </div>
     </div>
   );

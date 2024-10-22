@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import { generateTasks } from '../services/aiService';
+import 'react-quill/dist/quill.snow.css';
 
-function TaskInput({ onTasksGenerated }) {
-  const [input, setInput] = useState('');
+function TaskInput({ onTasksGenerated, teamMembers, editorContent, setEditorContent }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -13,9 +11,13 @@ function TaskInput({ onTasksGenerated }) {
     setIsLoading(true);
     setError(null);
     try {
-      const generatedTasks = await generateTasks(input);
-      onTasksGenerated(generatedTasks);
-      setInput('');
+      const generatedTasks = await generateTasks(editorContent, teamMembers);
+      if (generatedTasks && generatedTasks.length > 0) {
+        onTasksGenerated(generatedTasks, editorContent);
+        setEditorContent('');
+      } else {
+        throw new Error('No tasks were generated');
+      }
     } catch (error) {
       console.error('Error generating tasks:', error);
       setError(error.message || 'Failed to generate tasks. Please try again.');
@@ -27,19 +29,7 @@ function TaskInput({ onTasksGenerated }) {
   return (
     <div className="task-input">
       <form onSubmit={handleSubmit}>
-        <ReactQuill 
-          value={input} 
-          onChange={setInput}
-          modules={{
-            toolbar: [
-              [{ 'header': [1, 2, false] }],
-              ['bold', 'italic', 'underline'],
-              [{'list': 'ordered'}, {'list': 'bullet'}],
-              ['clean']
-            ],
-          }}
-        />
-        <button type="submit" disabled={isLoading}>
+        <button type="submit" disabled={isLoading} className="generate-tasks-button">
           {isLoading ? 'Generating Tasks...' : 'Generate Tasks'}
         </button>
       </form>

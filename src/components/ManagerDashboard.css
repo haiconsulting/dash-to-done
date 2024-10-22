@@ -3,47 +3,92 @@
   color: white;
   padding: 20px;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.manager-dashboard h2 {
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
   color: #61dafb;
+  margin: 0;
 }
 
-.manual-task-form {
-  background-color: #3c3c3c;
+.dashboard-content {
+  display: flex;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.main-content {
+  width: 65%;
   padding: 20px;
+  background-color: #3c3c3c;
   border-radius: 5px;
-  margin-top: 20px;
 }
 
-.manual-task-form h3 {
-  color: #61dafb;
+.team-member-panel {
+  width: 30%;
+  padding: 20px;
+  background-color: #3c3c3c;
+  border-radius: 5px;
 }
 
-.manual-task-form input,
-.manual-task-form textarea,
-.manual-task-form select {
+.logout-button, .save-state-button, .generate-tasks-button {
+  background-color: #61dafb;
+  color: #2c2c2c;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.task-input, .task-board {
+  margin-bottom: 20px;
+}
+
+.task-input button {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  background-color: #4c4c4c;
-  border: none;
-  color: white;
-}
-
-.manual-task-form button {
-  background-color: #61dafb;
-  color: #2c2c2c;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-}
-
-button {
-  background-color: #61dafb;
-  color: #2c2c2c;
-  border: none;
-  padding: 10px 20px;
   margin-top: 10px;
-  cursor: pointer;
+}
+
+.task-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.task {
+  background-color: #4c4c4c;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+/* React Quill styles */
+.quill {
+  background-color: #4c4c4c;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.ql-toolbar {
+  background-color: #5c5c5c;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.ql-container {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  min-height: 150px;
+}
+
+.ql-editor {
+  font-size: 16px;
+  color: white;
 }

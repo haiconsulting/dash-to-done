@@ -40,6 +40,7 @@ function Task({ task, onEdit, isEditable }) {
       <h3>{task.title}</h3>
       <p>{task.description}</p>
       <p>Status: {task.status}</p>
+      <p>Assigned to: {task.assigned_team_member}</p>
       {isEditable && (
         <button onClick={() => setIsEditing(true)}>Edit</button>
       )}

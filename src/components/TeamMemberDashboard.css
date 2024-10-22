@@ -3,16 +3,43 @@
   color: white;
   padding: 20px;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.team-member-dashboard h2 {
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
   color: #61dafb;
+  margin: 0;
+}
+
+.task-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background-color: #3c3c3c;
+  border-radius: 5px;
+}
+
+.logout-button, .save-state-button {
+  background-color: #61dafb;
+  color: #2c2c2c;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .notification {
+  text-align: center;
+  padding: 20px;
   background-color: #3c3c3c;
-  color: #ff6b6b;
-  padding: 15px;
   border-radius: 5px;
-  margin-bottom: 20px;
 }

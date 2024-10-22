@@ -1,40 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loadTeamMembers } from '../services/teamMemberService';
 
 function Login({ setUser }) {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [teamMembers, setTeamMembers] = useState([]);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  useEffect(() => {
+    const loadedTeamMembers = loadTeamMembers();
+    setTeamMembers(loadedTeamMembers);
+  }, []);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Implement actual login logic with server
-    if (username === 'manager' && password === 'password') {
-      setUser({ id: 1, role: 'manager', username });
+    if (username.toLowerCase() === 'manager') {
+      setUser({ id: 1, name: 'Manager', role: 'manager' });
       navigate('/manager');
-    } else if (username === 'team-member' && password === 'password') {
-      setUser({ id: 2, role: 'team-member', username });
-      navigate('/team-member');
     } else {
-      alert('Invalid credentials');
+      const teamMember = teamMembers.find(member => member.name.toLowerCase() === username.toLowerCase());
+      if (teamMember) {
+        setUser({ id: teamMember.id, name: teamMember.name, role: 'team-member' });
+        navigate(`/team-member/${teamMember.id}`);
+      } else {
+        alert('Invalid username');
+      }
     }
   };
 
   return (
     <div className="login">
       <h2>Login</h2>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button type="submit">Login</button>
       </form>

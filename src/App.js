@@ -4,6 +4,7 @@ import ManagerDashboard from './components/ManagerDashboard';
 import TeamMemberDashboard from './components/TeamMemberDashboard';
 import Login from './components/Login';
 import './App.css';
+import 'react-quill/dist/quill.snow.css';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -29,11 +30,11 @@ function App() {
           <Route path="/" element={<Login setUser={setUser} />} />
           <Route 
             path="/manager" 
-            element={<ManagerDashboard user={user} tasks={tasks} setTasks={setTasks} />} 
+            element={<ManagerDashboard user={user} setUser={setUser} tasks={tasks} setTasks={setTasks} />} 
           />
           <Route 
-            path="/team-member" 
-            element={<TeamMemberDashboard user={user} tasks={tasks} setTasks={setTasks} />} 
+            path="/team-member/:id" 
+            element={<TeamMemberDashboard user={user} setUser={setUser} tasks={tasks} setTasks={setTasks} />} 
           />
         </Routes>
       </div>
