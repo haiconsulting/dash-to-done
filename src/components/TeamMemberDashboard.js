@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TaskInput from './TaskInput';
 import TaskBoard from './TaskBoard';
-import { loadAppState, saveAppState } from '../services/aiService';
+import Task from './Task'; // Add this import
+import { loadAppState, saveAppState, chunkTask } from '../services/aiService';
 import './TeamMemberDashboard.css';
 
 function TeamMemberDashboard({ user, tasks, setTasks }) {
   const [assignedTasks, setAssignedTasks] = useState([]);
+  const [focusedTask, setFocusedTask] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,11 +46,23 @@ function TeamMemberDashboard({ user, tasks, setTasks }) {
   };
 
   const handleLogout = () => {
-    // Clear user data from state
-    // This depends on how you're managing user state in your app
-    // For example, if you have a setUser function:
-    // setUser(null);
     navigate('/');
+  };
+
+  const handleFocus = (task) => {
+    setFocusedTask(task);
+  };
+
+  const handleChunk = async (task) => {
+    try {
+      const chunkedTasks = await chunkTask(task);
+      const updatedTasks = [...tasks.filter(t => t.id !== task.id), ...chunkedTasks];
+      setTasks(updatedTasks);
+      setAssignedTasks(updatedTasks.filter(t => t.assigned_team_member_id === user.id));
+    } catch (error) {
+      console.error('Error chunking task:', error);
+      alert('Failed to chunk task');
+    }
   };
 
   return (
@@ -58,6 +72,18 @@ function TeamMemberDashboard({ user, tasks, setTasks }) {
         <h2>Team Member Dashboard: {user.name}</h2>
         <button onClick={handleSaveState} className="save-state-button">Save State</button>
       </div>
+      {focusedTask && (
+        <div className="focus-section">
+          <h3>Focused Task</h3>
+          <Task
+            task={focusedTask}
+            onEdit={handleTaskEdit}
+            isEditable={true}
+            onFocus={() => {}}
+            onChunk={handleChunk}
+          />
+        </div>
+      )}
       {assignedTasks.length === 0 ? (
         <div className="notification">
           No tasks assigned yet.
@@ -67,6 +93,8 @@ function TeamMemberDashboard({ user, tasks, setTasks }) {
           tasks={assignedTasks} 
           onTaskEdit={handleTaskEdit} 
           isManager={false}
+          onFocus={handleFocus}
+          onChunk={handleChunk}
         />
       )}
     </div>

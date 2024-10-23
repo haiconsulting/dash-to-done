@@ -1,0 +1,36 @@
+.calendar-container {
+  background-color: #3c3c3c;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.rbc-calendar {
+  background-color: #4c4c4c;
+  color: white;
+}
+
+.rbc-header {
+  background-color: #5c5c5c;
+  padding: 10px;
+}
+
+.rbc-event {
+  background-color: #61dafb;
+  color: #2c2c2c;
+}
+
+.rbc-today {
+  background-color: #5c5c5c;
+}
+
+.rbc-off-range-bg {
+  background-color: #3c3c3c;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid #5c5c5c;
+}
+
+.rbc-month-row + .rbc-month-row {
+  border-top: 1px solid #5c5c5c;
+}

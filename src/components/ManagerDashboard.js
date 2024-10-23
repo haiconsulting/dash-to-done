@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import TaskInput from './TaskInput';
 import TaskBoard from './TaskBoard';
 import TeamMemberPanel from './TeamMemberPanel';
-import { saveAppState, loadAppState } from '../services/aiService';
+import Calendar from './Calendar';
+import { saveAppState, loadAppState, chunkTask } from '../services/aiService';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './ManagerDashboard.css';
@@ -12,6 +13,7 @@ function ManagerDashboard({ user, tasks, setTasks }) {
   const [teamMembers, setTeamMembers] = useState([]);
   const [userQueries, setUserQueries] = useState([]);
   const [editorContent, setEditorContent] = useState('');
+  const [calendarEvents, setCalendarEvents] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,9 +21,10 @@ function ManagerDashboard({ user, tasks, setTasks }) {
       try {
         const savedState = await loadAppState();
         if (savedState) {
-          setTeamMembers(savedState.teamMembers);
-          setTasks(savedState.tasks);
-          setUserQueries(savedState.userQueries);
+          setTeamMembers(savedState.teamMembers || []);
+          setTasks(savedState.tasks || []);
+          setUserQueries(savedState.userQueries || []);
+          setCalendarEvents(savedState.calendarEvents || []);
         }
       } catch (error) {
         console.error('Error loading app state:', error);
@@ -37,7 +40,7 @@ function ManagerDashboard({ user, tasks, setTasks }) {
     setUserQueries(updatedQueries);
     
     try {
-      await saveAppState({ teamMembers, tasks: updatedTasks, userQueries: updatedQueries });
+      await saveAppState({ teamMembers, tasks: updatedTasks, userQueries: updatedQueries, calendarEvents });
       console.log('State saved successfully after generating tasks');
     } catch (error) {
       console.error('Error saving state after generating tasks:', error);
@@ -49,11 +52,12 @@ function ManagerDashboard({ user, tasks, setTasks }) {
       task.id === editedTask.id ? editedTask : task
     );
     setTasks(updatedTasks);
+    saveAppState({ teamMembers, tasks: updatedTasks, userQueries, calendarEvents });
   };
 
   const handleSaveState = async () => {
     try {
-      await saveAppState({ teamMembers, tasks, userQueries });
+      await saveAppState({ teamMembers, tasks, userQueries, calendarEvents });
       alert('State saved successfully');
     } catch (error) {
       console.error('Error saving state:', error);
@@ -62,15 +66,41 @@ function ManagerDashboard({ user, tasks, setTasks }) {
   };
 
   const handleLogout = () => {
-    // Clear user data from state
-    // This depends on how you're managing user state in your app
-    // For example, if you have a setUser function:
-    // setUser(null);
     navigate('/');
   };
 
   const handleEditorChange = (content) => {
     setEditorContent(content);
+  };
+
+  const handleCalendarEventAdd = (event) => {
+    const updatedEvents = [...calendarEvents, event];
+    setCalendarEvents(updatedEvents);
+    saveAppState({ teamMembers, tasks, userQueries, calendarEvents: updatedEvents });
+  };
+
+  const handleTaskDrop = (task, start, end) => {
+    const updatedTask = { ...task, scheduledStart: start, scheduledEnd: end };
+    const updatedTasks = tasks.map(t => t.id === task.id ? updatedTask : t);
+    setTasks(updatedTasks);
+    saveAppState({ teamMembers, tasks: updatedTasks, userQueries, calendarEvents });
+  };
+
+  const handleTeamMembersChange = (updatedTeamMembers) => {
+    setTeamMembers(updatedTeamMembers);
+    saveAppState({ teamMembers: updatedTeamMembers, tasks, userQueries, calendarEvents });
+  };
+
+  const handleChunk = async (task) => {
+    try {
+      const chunkedTasks = await chunkTask(task);
+      const updatedTasks = [...tasks.filter(t => t.id !== task.id), ...chunkedTasks];
+      setTasks(updatedTasks);
+      saveAppState({ teamMembers, tasks: updatedTasks, userQueries, calendarEvents });
+    } catch (error) {
+      console.error('Error chunking task:', error);
+      alert('Failed to chunk task');
+    }
   };
 
   return (
@@ -106,9 +136,18 @@ function ManagerDashboard({ user, tasks, setTasks }) {
             tasks={tasks} 
             onTaskEdit={handleTaskEdit} 
             isManager={true}
+            onFocus={() => {}}
+            onChunk={handleChunk}
+            teamMembers={teamMembers}
+          />
+          <Calendar 
+            events={calendarEvents}
+            tasks={tasks}
+            onEventAdd={handleCalendarEventAdd}
+            onTaskDrop={handleTaskDrop}
           />
         </div>
-        <TeamMemberPanel teamMembers={teamMembers} setTeamMembers={setTeamMembers} />
+        <TeamMemberPanel teamMembers={teamMembers} setTeamMembers={handleTeamMembersChange} />
       </div>
     </div>
   );
